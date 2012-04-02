@@ -185,6 +185,7 @@ module VaultedBilling
             :"__type" => "BankcardTransaction:http://schemas.ipcommerce.com/CWS/v2.0/Transactions/Bankcard",
             :TransactionData => {
               :Amount => "%.2f" % amount,
+              :FeeAmount => "%.2f" % (options[:fee_amount] || 0),
               :ApprovalCode => options[:approval_code],
               :CurrencyCode => 4,
               :TransactionDateTime => Time.now.xmlschema,
@@ -236,6 +237,7 @@ module VaultedBilling
             :"__type" => "BankcardTransaction:http://schemas.ipcommerce.com/CWS/v2.0/Transactions/Bankcard",
             :TransactionData => {
               :Amount => "%.2f" % amount,
+              :FeeAmount => "%.2f" % (options[:fee_amount] || 0),
               :ApprovalCode => options[:approval_code],
               :CurrencyCode => 4,
               :TransactionDateTime => Time.now.xmlschema,
