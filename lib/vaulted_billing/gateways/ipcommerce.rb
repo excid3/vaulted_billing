@@ -17,7 +17,7 @@ module VaultedBilling
     #
     class Ipcommerce
       include VaultedBilling::Gateway
-      
+
       AvsResults = [
         "Not Set", "Not Included", "Match", "No Match", "Issuer Not Certified",
         "No Response From Card Association", "Unknown Response From Card Association", "Not Verified", "Bad Format"
@@ -50,7 +50,7 @@ module VaultedBilling
         UG UA AE GB US UM UY UZ VU VE
         VN VG VI WF EH YE YU ZM ZW
       ).freeze
-       
+
       Companies = {
         2 => /^4\d{12}(\d{3})?$/, # Visa
         3 => /^(5[1-5]\d{4}|677189)\d{10}$/, # MasterCard
@@ -65,12 +65,12 @@ module VaultedBilling
         "No Code Present", "Should Have Been Present", "Issuer Not Certified", "Invalid", "No Response",
         "Not Applicable"
       ].freeze
-      
+
       Endpoints = [
         "https://cws-01.ipcommerce.com/REST/2.0.15/",
         "https://cws-02.ipcommerce.com/REST/2.0.15/"
       ].freeze
-      
+
       TestEndpoints = [
         "https://cws-01.cert.ipcommerce.com/REST/2.0.15/",
         "https://cws-02.cert.ipcommerce.com/REST/2.0.15/"
@@ -125,13 +125,13 @@ module VaultedBilling
             })
           end
         end
-        
+
         def urls
           endpoints.collect do |url|
             url + "SvcInfo/token"
           end
         end
-        
+
         def endpoints
           @test_mode ? TestEndpoints : Endpoints
         end
@@ -167,8 +167,8 @@ module VaultedBilling
         authorization = authorize(customer, credit_card, 1.00, options)
         void = void(authorization.id, options) if authorization.success?
 
-        respond_with(credit_card, authorization.response, { 
-            :success => authorization.success?, 
+        respond_with(credit_card, authorization.response, {
+            :success => authorization.success?,
             :transactions => { :void => void, :authorization => authorization }
         }) do |cc|
           cc.vault_id = authorization.response.body['PaymentAccountDataToken'].presence
@@ -331,16 +331,16 @@ module VaultedBilling
 
 
       protected
-      
+
       def valid_code?(code)
         [0,1].include?(code)
       end
 
       def card_data(credit_card)
         return nil if credit_card.nil?
-        { 
+        {
           'PaymentAccountDataToken' => credit_card.vault_id,
-          'CardData' => { 
+          'CardData' => {
             'CardholderName' => credit_card.name_on_card.blank? ? nil : credit_card.name_on_card,
             'CardType' => self.class.credit_card_type_id(credit_card.card_number),
             'Expire' => credit_card.expires_on.try(:strftime, "%m%y"),
@@ -377,7 +377,7 @@ module VaultedBilling
         end
         return 1
       end
-      
+
       def generate_order_number
         (Time.now.to_f * 100000).to_i.to_s(36) + rand(60000000).to_s(36)
       end
@@ -396,7 +396,7 @@ module VaultedBilling
           url + params.join('/')
         end
       end
-      
+
       def endpoints
         @test_mode ? TestEndpoints : Endpoints
       end
@@ -444,7 +444,7 @@ module VaultedBilling
 
       def parse_avs_result(result)
         return nil unless result
-        { 
+        {
           :result => result['ActualResult'],
           :address => AvsResults[result['AddressResult']],
           :country => AvsResults[result['CountryResult']],
